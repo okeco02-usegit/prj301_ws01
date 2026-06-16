@@ -9,21 +9,24 @@ import javax.servlet.http.*;
 import lehuuhoanganh.utils.UserDAO;
 import lehuuhoanganh.utils.User;
 
-
 @WebServlet(name = "SearchController", urlPatterns = {"/SearchController"})
 public class SearchController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!checkLogin(request, response)) return;
+        if (!checkLogin(request, response)) {
+            return;
+        }
         response.sendRedirect("Search.html");
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!checkLogin(request, response)) return;
+        if (!checkLogin(request, response)) {
+            return;
+        }
 
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
@@ -84,6 +87,8 @@ public class SearchController extends HttpServlet {
 
         out.println("<br/><a href='Search.html'>Back</a>");
         out.println("</body></html>");
+        // Khúc cuối hàm doPost() trước khi out.close()
+
         out.close();
     }
 
