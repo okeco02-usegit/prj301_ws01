@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Login</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+            }
+            
+            h2 {
+                font-family: "Times New Roman", Times, serif;
+                font-size: 2em;
+                margin-top: 5px;
+                margin-bottom: 20px;
+            }
+
+            /* Kiểm soát khoảng cách giữa dòng Username và Password (gần nhau hơn) */
+            .form-group {
+                margin-bottom: 10px; /* Chỉnh số này nhỏ xuống nếu muốn sát nhau hơn nữa */
+            }
+
+            /* Khung bọc ô password để định vị bóng thoại game */
+            .password-wrapper {
+                position: relative;
+                display: inline-block;
+                vertical-align: middle;
+            }
+
+            input[type="text"], input[type="password"] {
+                width: 150px;
+                padding: 1px;
+                border: 1px solid #767676;
+                transition: all 0.3s ease;
+            }
+
+            /* Đổi màu viền và nền đỏ nhẹ khi trống trường dữ liệu */
+            .input-error {
+                border: 1px solid #ff4d4d !important;
+                background-color: #ffeef0 !important;
+            }
+
+            /* Tooltip dạng bóng thoại (Speech Bubble) nằm bên phải ô mật khẩu */
+            .game-speech-bubble {
+                position: absolute;
+                left: 165px; 
+                top: 50%;
+                transform: translateY(-50%);
+                background-color: #fff9c4; 
+                color: #000;
+                padding: 4px 10px;
+                font-size: 12px;
+                border: 2px solid #000; 
+                border-radius: 4px;
+                white-space: nowrap;
+                z-index: 99;
+                
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.4s ease;
+            }
+
+            .game-speech-bubble.show {
+                opacity: 1;
+            }
+
+            /* Mũi tên bóng thoại trỏ sang bên trái */
+            .game-speech-bubble::after {
+                content: "";
+                position: absolute;
+                right: 100%;
+                top: 50%;
+                transform: translateY(-50%);
+                border-width: 6px;
+                border-style: solid;
+                border-color: transparent #000 transparent transparent;
+            }
+            
+            .game-speech-bubble::before {
+                content: "";
+                position: absolute;
+                right: 100%;
+                top: 50%;
+                transform: translateY(-50%);
+                margin-right: -2px;
+                border-width: 5px;
+                border-style: solid;
+                border-color: transparent #fff9c4 transparent transparent;
+                z-index: 100;
+            }
+
+            /* Khu vực các nút bấm */
+            .btn-group {
+                margin-top: 15px;
+                margin-bottom: 15px;
+            }
+
+            input[type="submit"], input[type="reset"] {
+                padding: 2px 10px;
+                cursor: pointer;
+                margin-right: 5px;
+            }
+
+            /* Vùng hiển thị lỗi chữ đỏ từ Servlet (Nằm ở dưới cùng, dưới cả nút Login/Reset) */
+            .error-red-text {
+                color: red;
+                font-size: 13px;
+                margin-top: 10px;
+                display: none;
+                font-weight: normal;
+            }
+        </style>
+    </head>
+    <body>
+        <h2>Login</h2>
+
+        <form id="loginForm" action="LoginController" method="post" onsubmit="return validateForm()">
+            
+            <div class="form-group">
+                Username 
+                <input type="text" id="txtUserName" name="txtUserName" placeholder="Uxxx" />
+            </div>
+
+            <div class="form-group">
+                Password 
+                <div class="password-wrapper">
+                    <input type="password" id="txtPassword" name="txtPassword" />
+                    
+                    <div class="game-speech-bubble" id="blankTooltip">
+                        Username or password cannot be blank
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <input type="submit" value="Login" />
+                <input type="reset" value="Reset" onclick="clearError()" />
+            </div>
+            
+            <div class="error-red-text" id="backendError"></div>
+        </form>
+
+        <script>
+            let tooltipTimeout;
+
+            window.onload = function () {
+                const params = new URLSearchParams(window.location.search);
+                const errorMsg = params.get("error");
+                const savedUser = params.get("username");
+                const errorDiv = document.getElementById("backendError");
+
+                // Nhận diện lỗi từ Servlet và hiển thị dưới các nút bấm
+                if (errorMsg) {
+                    errorDiv.textContent = decodeURIComponent(errorMsg);
+                    errorDiv.style.display = "block";
+                }
+
+                // Giữ lại nội dung Username cũ khi trang bị reload do lỗi từ Server
+                if (savedUser) {
+                    document.getElementById("txtUserName").value = decodeURIComponent(savedUser);
+                }
+            };
+
+            // Hàm kiểm tra trống trường dữ liệu phía Client
+            function validateForm() {
+                const user = document.getElementById("txtUserName");
+                const pass = document.getElementById("txtPassword");
+                const tooltip = document.getElementById("blankTooltip");
+                const backendError = document.getElementById("backendError");
+                
+                let isValid = true;
+
+                user.classList.remove("input-error");
+                pass.classList.remove("input-error");
+                tooltip.classList.remove("show");
+
+                if (user.value.trim() === "" || pass.value.trim() === "") {
+                    backendError.style.display = "none"; // Ẩn lỗi đỏ bên dưới đi khi đang sửa
+                    
+                    if (user.value.trim() === "") user.classList.add("input-error");
+                    if (pass.value.trim() === "") pass.classList.add("input-error");
+                    
+                    // Bật hiệu ứng bóng thoại kế bên ô password
+                    tooltip.classList.add("show");
+                    
+                    clearTimeout(tooltipTimeout);
+                    // Biến mất từ từ sau 2 giây
+                    tooltipTimeout = setTimeout(() => {
+                        tooltip.classList.remove("show");
+                    }, 2000);
+                    
+                    isValid = false; // Chặn submit, giữ nguyên dữ liệu đang gõ
+                }
+                
+                return isValid;
+            }
+
+            function clearError() {
+                clearTimeout(tooltipTimeout);
+                document.getElementById("blankTooltip").classList.remove("show");
+                document.getElementById("backendError").style.display = "none";
+                document.getElementById("txtUserName").classList.remove("input-error");
+                document.getElementById("txtPassword").classList.remove("input-error");
+            }
+        </script>
+    </body>
+</html>
