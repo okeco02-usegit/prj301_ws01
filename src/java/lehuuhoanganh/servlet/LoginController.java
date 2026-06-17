@@ -9,14 +9,7 @@ import javax.servlet.http.*;
 import lehuuhoanganh.utils.UserDAO;
 import lehuuhoanganh.utils.User;
 
-/**
- * Handles POST from Login.html.
- *
- * Case 1: blank fields      → blocked by JS on client, never reaches here
- * Case 2: wrong credentials → redirect back Login.html?error=...  (red text, no page change)
- * Case 3: correct but not admin (isAdmin=0) → redirect back Login.html?error=...
- * Case 4: correct + admin   → session.setAttribute("USER", user) → welcome page
- *
+/*
  * @author LeHuuHoangAnh
  */
 @WebServlet(name = "LoginController", urlPatterns = {"/LoginController"})
@@ -28,7 +21,7 @@ public class LoginController extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         String userName = request.getParameter("txtUserName");
-        String password  = request.getParameter("txtPassword");
+        String password = request.getParameter("txtPassword");
 
         // ── Case 1: server-side blank check (backup for JS disabled) ─
         if (userName == null || userName.trim().isEmpty()
@@ -40,8 +33,6 @@ public class LoginController extends HttpServlet {
         try {
             UserDAO dao = new UserDAO();
             User user = dao.login(userName.trim(), password.trim());
-
-            // ── Case 2: wrong username or password ───────────────────
             if (user == null) {
                 sendError(response, "Invalid username or password.");
                 return;
@@ -83,10 +74,32 @@ public class LoginController extends HttpServlet {
         }
     }
 
-    @Override
+   @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.sendRedirect("Login.html");
+        // Kiểm tra xem người dùng đã đăng nhập chưa (đã có session chưa)
+        HttpSession session = request.getSession(false);
+        if (session != null && session.getAttribute("loggedUser") != null) {
+            User user = (User) session.getAttribute("loggedUser");
+            
+            // Nếu đã đăng nhập, in lại giao diện Menu chính (Welcome Page)
+            response.setContentType("text/html;charset=UTF-8");
+            PrintWriter out = response.getWriter();
+            out.println("<!DOCTYPE html>");
+            out.println("<html><head><title>Main Menu</title></head><body>");
+            out.println("<p>Welcome back, " + user.getLastName() + " !!!</p>");
+            out.println("<p>You are logged successfully in with administrator role.</p>");
+            out.println("<a href='SearchController'>Search user</a><br/>");
+            out.println("<a href='ListController'>View user list</a><br/>");
+            out.println("<a href='UpdateUser.html'>Update user</a><br/>");
+            out.println("<a href='DeleteUser.html'>Delete user</a><br/>");
+            out.println("<br/><a href='LogoutController'>Logout</a>");
+            out.println("</body></html>");
+            out.close();
+        } else {
+            // Nếu chưa đăng nhập hoặc session đã hết hạn, chuyển về Login.html
+            response.sendRedirect("Login.html");
+        }
     }
 
     // ── Helper: redirect back to Login.html with error message ───────

@@ -9,8 +9,9 @@ import lehuuhoanganh.utils.UserDAO;
 import lehuuhoanganh.utils.User;
 
 /**
- * POST from DeleteUser.html -> delete user by userName, print result.
- * GET  -> called from search result Delete link, delete directly, print result.
+ * POST from DeleteUser.html -> delete user by userName, print result. GET ->
+ * called from search result Delete link, delete directly, print result.
+ *
  * @author LeHuuHoangAnh
  */
 @WebServlet(name = "DeleteController", urlPatterns = {"/DeleteController"})
@@ -20,7 +21,9 @@ public class DeleteController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // Called from search result table "Delete" link
-        if (!checkAdmin(request, response)) return;
+        if (!checkAdmin(request, response)) {
+            return;
+        }
 
         String userName = request.getParameter("userName");
         processDelete(userName, request, response);
@@ -30,14 +33,16 @@ public class DeleteController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // Called from DeleteUser.html form
-        if (!checkAdmin(request, response)) return;
+        if (!checkAdmin(request, response)) {
+            return;
+        }
 
         String userName = request.getParameter("txtUserName");
         processDelete(userName, request, response);
     }
 
     private void processDelete(String userName, HttpServletRequest request,
-                                HttpServletResponse response)
+            HttpServletResponse response)
             throws IOException {
 
         response.setContentType("text/html;charset=UTF-8");
@@ -78,7 +83,7 @@ public class DeleteController extends HttpServlet {
 
         out.println("<a href='DeleteUser.html'>Delete another</a><br/>");
         out.println("<a href='ListController'>View user list</a><br/>");
-        out.println("<a href='Login.html'>Back to login</a>");
+        out.println("<a href='LoginController'>Back to Menu</a>");
         out.println("</body></html>");
         out.close();
     }
@@ -96,7 +101,7 @@ public class DeleteController extends HttpServlet {
             PrintWriter out = response.getWriter();
             out.println("<!DOCTYPE html><html><body>");
             out.println("<p style='color:red'>Access denied. Admin role required.</p>");
-            out.println("<a href='Login.html'>Back to login</a>");
+            out.println("<a href='LoginController'>Back to Menu</a>");
             out.println("</body></html>");
             return false;
         }

@@ -10,6 +10,7 @@ import lehuuhoanganh.utils.User;
 
 /**
  * POST from UpdateUser.html -> validate + save + print result.
+ *
  * @author LeHuuHoangAnh
  */
 @WebServlet(name = "UpdateController", urlPatterns = {"/UpdateController"})
@@ -18,14 +19,16 @@ public class UpdateController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (!checkAdmin(request, response)) return;
+        if (!checkAdmin(request, response)) {
+            return;
+        }
 
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
 
-        String userName   = request.getParameter("txtUserName");
-        String password   = request.getParameter("txtPassword");
-        String lastName   = request.getParameter("txtLastName");
+        String userName = request.getParameter("txtUserName");
+        String password = request.getParameter("txtPassword");
+        String lastName = request.getParameter("txtLastName");
         String isAdminStr = request.getParameter("chkIsAdmin");
 
         out.println("<!DOCTYPE html>");
@@ -73,7 +76,7 @@ public class UpdateController extends HttpServlet {
 
         out.println("<a href='UpdateUser.html'>Update another</a><br/>");
         out.println("<a href='ListController'>View user list</a><br/>");
-        out.println("<a href='Login.html'>Back to login</a>");
+        out.println("<a href='LoginController'>Back to Menu</a>");
         out.println("</body></html>");
         out.close();
     }
@@ -97,7 +100,7 @@ public class UpdateController extends HttpServlet {
             PrintWriter out = response.getWriter();
             out.println("<!DOCTYPE html><html><body>");
             out.println("<p style='color:red'>Access denied. Admin role required.</p>");
-            out.println("<a href='Login.html'>Back to login</a>");
+            out.println("<a href='LoginController'>Back to Menu</a>");
             out.println("</body></html>");
             return false;
         }

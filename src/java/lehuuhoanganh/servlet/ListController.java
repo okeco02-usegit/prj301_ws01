@@ -47,7 +47,7 @@ public class ListController extends HttpServlet {
 
         out.println("<br/><a href='UpdateUser.html'>Update user</a><br/>");
         out.println("<a href='DeleteUser.html'>Delete user</a><br/>");
-        out.println("<a href='Login.html'>Back to login</a>");
+        out.println("<a href='LoginController'>Back to Menu</a>");
         out.println("</body></html>");
         out.close();
     }
