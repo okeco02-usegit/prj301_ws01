@@ -65,7 +65,7 @@ public class ListController extends HttpServlet {
             PrintWriter out = response.getWriter();
             out.println("<!DOCTYPE html><html><body>");
             out.println("<p style='color:red'>Access denied. Admin role required.</p>");
-            out.println("<a href='Login.html'>Back to login</a>");
+            out.println("<a href='LoginController'>Back</a>");
             out.println("</body></html>");
             return false;
         }

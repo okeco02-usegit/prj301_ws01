@@ -18,7 +18,7 @@ public class SearchController extends HttpServlet {
         if (!checkLogin(request, response)) {
             return;
         }
-        response.sendRedirect("Search.html");
+        response.sendRedirect("SearchUser.html");
     }
 
     @Override
@@ -40,7 +40,7 @@ public class SearchController extends HttpServlet {
         // --- Validation ---
         if (keyword == null || keyword.trim().isEmpty()) {
             out.println("<p style='color:red'>Please enter a search keyword.</p>");
-            out.println("<a href='Search.html'>Back</a>");
+            out.println("<a href='SearchUser.html'>Back</a>");
             out.println("</body></html>");
             return;
         }
@@ -85,7 +85,7 @@ public class SearchController extends HttpServlet {
             out.println("<p style='color:red'>Error: " + ex.getMessage() + "</p>");
         }
 
-        out.println("<br/><a href='Search.html'>Back</a>");
+        out.println("<br/><a href='SearchUser.html'>Back</a>");
         out.println("</body></html>");
 
         out.close();
