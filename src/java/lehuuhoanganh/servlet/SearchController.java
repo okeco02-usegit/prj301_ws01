@@ -86,9 +86,6 @@ public class SearchController extends HttpServlet {
         }
 
         out.println("<br/><a href='Search.html'>Back</a>");
-        
-        // Cách 1: Dùng nút bấm JavaScript quay lại trang trước (giữ nguyên keyword vừa nhập)
-        out.println("<br/><button onclick='history.back()'>Back (Keep Keyword)</button>");
         out.println("</body></html>");
 
         out.close();
